@@ -4,11 +4,6 @@ const Upload = require('../models/Upload');
 
 const router = express.Router();
 
-const multer = require('multer');
-//setting options for multer
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
 router.get('/members', async (req, res) => {
   try {
     const data = await Member.find();

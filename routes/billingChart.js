@@ -1,15 +1,10 @@
 const express = require('express');
-const multer = require('multer');
 
 const Member = require('../models/member');
 const Upload = require('../models/Upload');
 const BillingChart = require('../models/billingChart');
 
 const router = express.Router();
-
-//setting options for multer
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 router.get('/billingChart', async (req, res) => {
   try {
