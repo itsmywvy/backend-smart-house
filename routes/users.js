@@ -39,7 +39,9 @@ router.post('/users/signup', async (req, res) => {
     const checkDuplicate = await User.findOne({ email: req.body.email });
 
     if (checkDuplicate) {
-      res.json({ success: false, error: 'User with this email has already been created' });
+      res
+        .status(409)
+        .json({ success: false, error: 'User with this email has already been created' });
     } else {
       User.create({
         firstName: req.body.firstName,
