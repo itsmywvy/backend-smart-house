@@ -97,7 +97,7 @@ router.get('/user/profile', async (req, res) => {
       token = authHeader.split(' ')[1];
 
       // verified token returns user id
-      const decoded = jwt.verify(token, process.env.SECRET_JWT_CODE);
+      const decoded = jwt.verify(token, `${process.env.SECRET_JWT_CODE}`);
 
       // find user's obj in db and assign to req.user
       req.user = await User.findById(decoded.id).select('-password');
