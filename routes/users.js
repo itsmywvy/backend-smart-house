@@ -3,8 +3,6 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const SECRET_JWT_CODE = 'psmR2HuOihHKfqZymo1m';
-
 const router = express.Router();
 
 router.get('/users', async (req, res) => {
@@ -28,7 +26,7 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
-router.post('/users/signup', async (req, res) => {
+router.post('/user/signup', async (req, res) => {
   try {
     console.log(req.body);
     if (!req.body.email || !req.body.password) {
@@ -49,7 +47,7 @@ router.post('/users/signup', async (req, res) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
       }).then((user) => {
-        const token = jwt.sign({ id: user._id, email: user.email }, SECRET_JWT_CODE);
+        const token = jwt.sign({ id: user._id, email: user.email }, process.env.SECRET_JWT_CODE);
         res.json({ success: true, token, message: 'User was created successfully' });
       });
     }
@@ -58,27 +56,69 @@ router.post('/users/signup', async (req, res) => {
   }
 });
 
-router.post('/users/login', async (req, res) => {
+router.post('/user/login', async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    if (!req.body.email || !req.body.password) {
+    if (!email || !password) {
       res.json({ success: false, error: 'Send needed params' });
       return;
     }
 
-    User.findOne({ email: req.body.email }).then((user) => {
+    User.findOne({ email: email }).then((user) => {
       if (!user) {
         res.json({ success: false, error: 'User does not exist' });
       } else {
-        if (!bcrypt.compareSync(req.body.password, user.password)) {
+        if (!bcrypt.compareSync(password, user.password)) {
           res.json({ success: false, error: 'Wrong password' });
         } else {
-          const token = jwt.sign({ id: user._id }, SECRET_JWT_CODE);
+          const token = jwt.sign({ id: user._id }, process.env.SECRET_JWT_CODE);
           res.json({ succes: true, token, user });
         }
       }
     });
   } catch (error) {
     res.json({ success: false, error: error });
+  }
+});
+
+router.get('/user/profile', async (req, res) => {
+  let token;
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer')) {
+    try {
+      // extract token from authHeader string
+      token = authHeader.split(' ')[1];
+
+      // verified token returns user id
+      const decoded = jwt.verify(token, process.env.SECRET_JWT_CODE);
+
+      // find user's obj in db and assign to req.user
+      req.user = await User.findById(decoded.id).select('-password');
+
+      const user = await User.findById(req.user._id);
+
+      if (user) {
+        res.json({
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.firstName,
+          email: user.email,
+        });
+      } else {
+        res.status(404);
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      res.status(401);
+      throw new Error('Not authorized, invalid token');
+    }
+  }
+
+  if (!token) {
+    res.status(401);
+    throw new Error('Not authorized, no token found');
   }
 });
 
