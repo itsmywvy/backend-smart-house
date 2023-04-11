@@ -49,7 +49,10 @@ router.post('/user/signup', async (req, res) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
       }).then((user) => {
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.SECRET_JWT_CODE);
+        const token = jwt.sign(
+          { id: user._id, email: user.email },
+          `${process.env.SECRET_JWT_CODE}`,
+        );
         res.json({ success: true, token, message: 'User was created successfully' });
       });
     }
@@ -74,7 +77,7 @@ router.post('/user/login', async (req, res) => {
         if (!bcrypt.compareSync(password, user.password)) {
           res.json({ success: false, error: 'Wrong password' });
         } else {
-          const token = jwt.sign({ id: user._id }, process.env.SECRET_JWT_CODE);
+          const token = jwt.sign({ id: user._id }, `${process.env.SECRET_JWT_CODE}`);
           res.json({ succes: true, token, user });
         }
       }
