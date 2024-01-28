@@ -1,26 +1,12 @@
 const mongoose = require('mongoose');
 
 const billingChartSchema = new mongoose.Schema({
-  number: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  month: {
+  label: {
     type: String,
   },
-  dueData: {
-    type: String,
-  },
-  amountDue: {
-    type: Number,
-  },
-  status: {
-    type: Boolean,
+  data: {
+    type: Array,
   },
 });
 
-module.exports = mongoose.model('BillingChart', billingChartSchema);
+module.exports = mongoose.model('Billing-Chart', billingChartSchema);
