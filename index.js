@@ -57,3 +57,5 @@ database.once('connected', () => {
   console.log('Database Connected');
   console.log(process.env.DATABASE_URL);
 });
+
+module.exports = app;
