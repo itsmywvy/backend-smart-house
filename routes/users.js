@@ -140,30 +140,31 @@ router.post('/user/signup', async (req, res) => {
 
 router.post('/user/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
 
-  try {
-    if (!email || !password) {
-      res.json({ success: false, error: 'Send needed params' });
-      return;
-    }
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      res.json({ success: false, error: 'User does not exist' });
-    } else {
-      if (await !bcrypt.compareSync(password, user.password)) {
-        res.json({ success: false, error: 'Wrong password' });
-      } else {
-        // Create sign with secret key
-        const token = jwt.sign({ id: user._id, email }, process.env.SECRET_JWT_CODE, {
-          expiresIn: '2h',
-        });
-        res.json({ success: true, token, user });
-      }
-    }
-  } catch (error) {
-    res.status(422).json({ success: false, error });
+  // try {
+  if (!email || !password) {
+    res.json({ success: false, error: 'Send needed params' });
+    return;
   }
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.json({ success: false, error: 'User does not exist' });
+  } else {
+    if (await !bcrypt.compareSync(password, user.password)) {
+      res.json({ success: false, error: 'Wrong password' });
+    } else {
+      // Create sign with secret key
+      const token = jwt.sign({ id: user._id, email }, process.env.SECRET_JWT_CODE, {
+        expiresIn: '2h',
+      });
+      res.json({ success: true, token, user });
+    }
+  }
+  // } catch (error) {
+  //   res.status(422).json({ success: false, error });
+  // }
 });
 
 // Get user profile
