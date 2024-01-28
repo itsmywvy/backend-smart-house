@@ -42,7 +42,7 @@ router.route('/users/:id').get(protect, async (req, res) => {
     res.json({
       id: user._id,
       firstName: user.firstName,
-      lastName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
     });
     res.json(data);
